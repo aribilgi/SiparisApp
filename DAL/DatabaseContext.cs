@@ -32,7 +32,24 @@ namespace DAL
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseSqlServer(@"data source=(LocalDB)\MSSQLLocalDB; initial catalog=SiparisAlmaProgrami; integrated security=True; MultipleActiveResultSets=True;"); // Burada veritabanı olarak sql server kullanacağımızı belirtip parantez içinde connection string yani veritabanı bağlantı bilgilerimizi giriyoruz
+            optionsBuilder.UseSqlServer(@"data source=(LocalDB)\MSSQLLocalDB; initial catalog=SiparisApp; integrated security=True; MultipleActiveResultSets=True;"); // Burada veritabanı olarak sql server kullanacağımızı belirtip parantez içinde connection string yani veritabanı bağlantı bilgilerimizi giriyoruz
+        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Bu metot model yapımız oluştuktan sonra çalışır ve burada db oluştuktan sonra kayıt ekleme gibi işlemler yapabiliriz
+            modelBuilder.Entity<User>()
+            .HasData( // HasData metoduyla db ilk oluştuğunda kayıt yoksa yeni kayıt ekleriz
+            new User
+            {
+                Id = 1,
+                CreateDate = DateTime.Now,
+                Email = "admin@siparisapp.com",
+                IsActive = true,
+                Name = "Admin",
+                UserName = "admin",
+                Password = "123"
+            }); // .net core da önceki .net deki seed metodunun yaptığı işi bu şekilde hasdata metoduyla yapabiliyoruz
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

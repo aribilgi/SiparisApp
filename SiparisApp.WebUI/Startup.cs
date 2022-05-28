@@ -1,6 +1,8 @@
+using DAL;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,13 +25,17 @@ namespace SiparisApp.WebUI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Bu metot içerisinde projede kullanacaðýmýz servisleri tanýmlýyoruz
             services.AddControllersWithViews();
+            services.AddRazorPages();
+            services.AddSession(); // Projede session kullanabilmek için
+            services.AddDbContext<DatabaseContext>(options => options.UseSqlServer()); // .net core da dbcontext i servis olarak bu þekilde eklememiz gerekiyor
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-        // Bu metot içerisinde app parametresiyle uygulamayla alakalý ayarlar yapýlandýrýlýr.
+            // Bu metot içerisinde app parametresiyle uygulamayla alakalý ayarlar yapýlandýrýlýr.
 
             if (env.IsDevelopment()) // Eðer uygulama development yani geliþtirme modundaysa
             {
@@ -50,6 +56,9 @@ namespace SiparisApp.WebUI
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllerRoute(
+                name: "Admin", // Admin paneline giriþ iþin bu kodlarý ekledik. Admin de buradaki url yapýsý kullanýlacak
+                pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapControllerRoute( // .net core da endpoints-uç nokta sistemi ile routing kullanýlýyor
                     name: "default", // route adýmýz
                     pattern: "{controller=Home}/{action=Index}/{id?}"); // route çalýþma sistemi
