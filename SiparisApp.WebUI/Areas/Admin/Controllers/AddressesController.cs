@@ -4,16 +4,25 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Entities;
+using BL;
 
 namespace SiparisApp.WebUI.Areas.Admin.Controllers
 {
     [Area("Admin")]
     public class AddressesController : Controller
     {
-        // GET: AddressesController
-        public ActionResult Index()
+        private readonly IRepository<Address> _repository; // Dependency Injection ile veritabanı işlemleri yapabilmek için IRepository interface ini burada readonly olarak tanımlıyoruz. Startup.cs dosyasında tanımladığımız services sayesinde burada constructor da yapacağımız DI işlemiyle bizim için Repository sınıfından adres işlemleri için bir nesne oluşturulur.
+
+        public AddressesController(IRepository<Address> repository)
         {
-            return View();
+            _repository = repository;
+        }
+
+        // GET: AddressesController
+        public async Task<ActionResult> IndexAsync()
+        {
+            return View(await _repository.GetAllAsync()); // GetAllAsync metodu asenkron metod olduğu için asenkron metotları çağırmak için başına await anahtar kelimesi yazmak zorundayız! await yazdığımızda ise ActionResult metodunu async olarak değiştirmemiz gerekir. Bu işlemi de ampule tıklayıp make method async diyerek visual studio ya yaptırabiliriz..
         }
 
         // GET: AddressesController/Details/5
@@ -31,16 +40,22 @@ namespace SiparisApp.WebUI.Areas.Admin.Controllers
         // POST: AddressesController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult> CreateAsync(Address address)
         {
-            try
+            if (ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    address.CreateDate = DateTime.Now;
+                    await _repository.AddAsync(address);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch
+                {
+                    ModelState.AddModelError("", "Hata Oluştu!");
+                }
             }
-            catch
-            {
-                return View();
-            }
+            return View(address);
         }
 
         // GET: AddressesController/Edit/5
@@ -56,7 +71,7 @@ namespace SiparisApp.WebUI.Areas.Admin.Controllers
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(IndexAsync));
             }
             catch
             {
@@ -77,7 +92,7 @@ namespace SiparisApp.WebUI.Areas.Admin.Controllers
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(IndexAsync));
             }
             catch
             {

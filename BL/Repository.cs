@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace BL
@@ -13,7 +12,7 @@ namespace BL
     public class Repository<T> : IRepository<T> where T : class, IEntity, new()
     {
         DatabaseContext context;
-        DbSet<T> _objectSet;
+        protected DbSet<T> _objectSet; // protected ile aynı projede kullanılabilmesini sağladık.
         public Repository()
         {
             if (context == null) // eğer context nullsa
@@ -86,12 +85,12 @@ namespace BL
 
         public int SaveChanges()
         {
-            return SaveChanges();
+            return context.SaveChanges();
         }
 
         public async Task<int> SaveChangesAsync()
         {
-            return await SaveChangesAsync();
+            return await context.SaveChangesAsync();
         }
 
         public int Update(T entity)

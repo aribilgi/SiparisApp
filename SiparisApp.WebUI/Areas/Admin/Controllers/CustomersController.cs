@@ -1,19 +1,19 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Entities;
+using BL;
 
 namespace SiparisApp.WebUI.Areas.Admin.Controllers
 {
     [Area("Admin")]
     public class CustomersController : Controller
     {
+        CustomerManager manager = new();
         // GET: CustomersController
         public ActionResult Index()
         {
-            return View();
+            return View(manager.GetAll());
         }
 
         // GET: CustomersController/Details/5
@@ -31,52 +31,64 @@ namespace SiparisApp.WebUI.Areas.Admin.Controllers
         // POST: CustomersController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Customer customer)
         {
-            try
+            if (ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    customer.CreateDate = DateTime.Now;
+                    manager.Add(customer);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch
+                {
+                    ModelState.AddModelError("", "Hata Oluştu!");
+                }
             }
-            catch
-            {
-                return View();
-            }
+            return View(customer);
         }
 
         // GET: CustomersController/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            return View(manager.Find(id));
         }
 
         // POST: CustomersController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, Customer customer)
         {
-            try
+            if (ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    manager.Update(customer);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch
+                {
+                    ModelState.AddModelError("", "Hata Oluştu!");
+                }
             }
-            catch
-            {
-                return View();
-            }
+            return View(customer);
         }
 
         // GET: CustomersController/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            return View(manager.Find(id));
         }
 
         // POST: CustomersController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id, Customer customer)
         {
             try
             {
+                manager.Delete(customer);
                 return RedirectToAction(nameof(Index));
             }
             catch

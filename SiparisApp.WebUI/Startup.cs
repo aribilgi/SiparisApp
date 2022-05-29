@@ -1,15 +1,11 @@
+using BL;
 using DAL;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SiparisApp.WebUI
 {
@@ -30,6 +26,12 @@ namespace SiparisApp.WebUI
             services.AddRazorPages();
             services.AddSession(); // Projede session kullanabilmek için
             services.AddDbContext<DatabaseContext>(options => options.UseSqlServer()); // .net core da dbcontext i servis olarak bu þekilde eklememiz gerekiyor
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>)); // Dependency Injection ile projemize IRepository ile nesne oluþurulursa oraya Repository classýndan bir örnek göndermesini söyledik
+
+            //Diðer Dependency Injection yöntemleri :
+            // AddSingleton : Uygulama ayaða kalkarken çalýþan ConfigureServices metodunda bu yöntem ile tanýmladýðýmýz her sýnýftan sadece bir örnek oluþturulur. Kim nereden çaðýrýrsa çaðýrsýn kendisine bu örnek gönderilir. Uygulama yeniden baþlayana kadar yenisi üretilmez.
+            // AddTransient : Uygulama çalýþma zamanýnda belirli koþullarda üretilir veya varolan örneði kullanýr. 
+            // AddScoped : Uygulama çalýþýrken her istek için ayrý ayrý nesne üretilir.
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

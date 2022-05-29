@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace BL
 {
-    interface IRepository<T> where T : class // Buraya gönderilecek T bir class olmalıdır!
+    public interface IRepository<T> where T : class // Buraya gönderilecek T bir class olmalıdır!
     {
         List<T> GetAll();
         List<T> GetAll(Expression<Func<T, bool>> expression);

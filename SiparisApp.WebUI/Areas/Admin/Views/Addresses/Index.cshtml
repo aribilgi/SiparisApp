@@ -1,0 +1,53 @@
+﻿@model IEnumerable<Entities.Address>
+
+@{
+    ViewData["Title"] = "Adresler";
+}
+
+<h1>Adresler</h1>
+
+<p>
+    <a asp-action="Create">Yeni Ekle</a>
+</p>
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OpenAddress)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreateDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Customer)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OpenAddress)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreateDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Customer.Name)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Düzenle</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Sil</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
