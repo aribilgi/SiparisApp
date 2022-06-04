@@ -1,19 +1,26 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Entities;
+using BL;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace SiparisApp.WebUI.Areas.Admin.Controllers
 {
     [Area("Admin")]
     public class CategoriesController : Controller
     {
-        // GET: CategoriesController
-        public ActionResult Index()
+        private readonly IRepository<Category> _repository;
+
+        public CategoriesController(IRepository<Category> repository)
         {
-            return View();
+            _repository = repository;
+        }
+
+        // GET: CategoriesController
+        public async Task<ActionResult> Index()
+        {
+            return View(await _repository.GetAllAsync());
         }
 
         // GET: CategoriesController/Details/5
@@ -31,52 +38,56 @@ namespace SiparisApp.WebUI.Areas.Admin.Controllers
         // POST: CategoriesController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult> Create(Category category)
         {
             try
             {
+                await _repository.AddAsync(category);
+                await _repository.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View();
+                return View(category);
             }
         }
 
         // GET: CategoriesController/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> EditAsync(int id)
         {
-            return View();
+            return View(await _repository.FindAsync(id));
         }
 
         // POST: CategoriesController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, Category category)
         {
             try
             {
+                _repository.Update(category);
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View();
+                return View(category);
             }
         }
 
         // GET: CategoriesController/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> DeleteAsync(int id)
         {
-            return View();
+            return View(await _repository.FindAsync(id));
         }
 
         // POST: CategoriesController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id, Category category)
         {
             try
             {
+                _repository.Delete(category);
                 return RedirectToAction(nameof(Index));
             }
             catch

@@ -27,6 +27,7 @@ namespace SiparisApp.WebUI
             services.AddSession(); // Projede session kullanabilmek için
             services.AddDbContext<DatabaseContext>(options => options.UseSqlServer()); // .net core da dbcontext i servis olarak bu þekilde eklememiz gerekiyor
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>)); // Dependency Injection ile projemize IRepository ile nesne oluþurulursa oraya Repository classýndan bir örnek göndermesini söyledik
+            services.AddTransient(typeof(CustomerManager), typeof(CustomerManager)); // Class ý DI ile kullanabilmek için servis olarak bu þekilde ekleyebiliriz.
 
             //Diðer Dependency Injection yöntemleri :
             // AddSingleton : Uygulama ayaða kalkarken çalýþan ConfigureServices metodunda bu yöntem ile tanýmladýðýmýz her sýnýftan sadece bir örnek oluþturulur. Kim nereden çaðýrýrsa çaðýrsýn kendisine bu örnek gönderilir. Uygulama yeniden baþlayana kadar yenisi üretilmez.

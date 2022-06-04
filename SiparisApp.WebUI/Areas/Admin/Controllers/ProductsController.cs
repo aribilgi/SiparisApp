@@ -1,19 +1,30 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Entities;
+using BL;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Http;
+using SiparisApp.WebUI.Utils;
 
 namespace SiparisApp.WebUI.Areas.Admin.Controllers
 {
     [Area("Admin")]
     public class ProductsController : Controller
     {
-        // GET: ProductsController
-        public ActionResult Index()
+        private readonly IRepository<Product> _repository;
+        private readonly IRepository<Category> _categoryRepository;
+
+        public ProductsController(IRepository<Product> repository, IRepository<Category> categoryRepository)
         {
-            return View();
+            _repository = repository;
+            _categoryRepository = categoryRepository;
+        }
+
+        // GET: ProductsController
+        public async Task<ActionResult> Index()
+        {
+            return View(await _repository.GetAllAsync());
         }
 
         // GET: ProductsController/Details/5
@@ -23,45 +34,61 @@ namespace SiparisApp.WebUI.Areas.Admin.Controllers
         }
 
         // GET: ProductsController/Create
-        public ActionResult Create()
+        public async Task<ActionResult> CreateAsync()
         {
+            ViewBag.CategoryId = new SelectList(await _categoryRepository.GetAllAsync(), "Id", "Name");
             return View();
         }
 
         // POST: ProductsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult> CreateAsync(Product product, IFormFile Image)
         {
-            try
+            if (ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    product.Image = FileHelper.FileLoader(Image);
+                    await _repository.AddAsync(product);
+                    await _repository.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch
+                {
+                    ModelState.AddModelError("", "Hata Oluştu!");
+                }
             }
-            catch
-            {
-                return View();
-            }
+            ViewBag.CategoryId = new SelectList(await _categoryRepository.GetAllAsync(), "Id", "Name");
+            return View(product);
         }
 
         // GET: ProductsController/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> EditAsync(int id)
         {
-            return View();
+            ViewBag.CategoryId = new SelectList(await _categoryRepository.GetAllAsync(), "Id", "Name");
+            return View(await _repository.FindAsync(id));
         }
 
         // POST: ProductsController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, Product product, IFormFile Image)
         {
             try
             {
+                if (Image != null)
+                {
+                    product.Image = FileHelper.FileLoader(Image);
+                }
+                _repository.Update(product);
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View();
+                ModelState.AddModelError("", "Hata Oluştu!");
             }
+            return View(product);
         }
 
         // GET: ProductsController/Delete/5
@@ -73,7 +100,7 @@ namespace SiparisApp.WebUI.Areas.Admin.Controllers
         // POST: ProductsController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id, Product product)
         {
             try
             {
