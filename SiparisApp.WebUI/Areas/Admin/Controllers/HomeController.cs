@@ -1,12 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SiparisApp.WebUI.Areas.Admin.Controllers
 {
-    [Area("Admin")] // .net core da admin sayfalarında bu attribute ü yazmazsak sayfa açılmıyor!
+    [Area("Admin"), Authorize] // .net core da admin sayfalarında bu attribute ü yazmazsak sayfa açılmıyor!
     public class HomeController : Controller
     {
         public IActionResult Index()

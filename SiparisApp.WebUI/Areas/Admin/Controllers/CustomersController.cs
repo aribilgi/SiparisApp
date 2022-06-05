@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using Entities;
 using BL;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SiparisApp.WebUI.Areas.Admin.Controllers
 {
-    [Area("Admin")]
+    [Area("Admin"), Authorize]
     public class CustomersController : Controller
     {
         CustomerManager manager = new();

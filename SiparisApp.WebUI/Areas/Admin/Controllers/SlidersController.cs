@@ -1,19 +1,27 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Entities;
+using BL;
+using Microsoft.AspNetCore.Http;
+using SiparisApp.WebUI.Utils;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SiparisApp.WebUI.Areas.Admin.Controllers
 {
-    [Area("Admin")]
+    [Area("Admin"), Authorize]
     public class SlidersController : Controller
     {
-        // GET: SlidersController
-        public ActionResult Index()
+        private readonly IRepository<Slider> _repository;
+
+        public SlidersController(IRepository<Slider> repository)
         {
-            return View();
+            _repository = repository;
+        }
+
+        // GET: SlidersController
+        public async Task<ActionResult> Index()
+        {
+            return View(await _repository.GetAllAsync());
         }
 
         // GET: SlidersController/Details/5
@@ -31,52 +39,63 @@ namespace SiparisApp.WebUI.Areas.Admin.Controllers
         // POST: SlidersController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult> CreateAsync(Slider slider, IFormFile Image)
         {
             try
             {
+                slider.Image = FileHelper.FileLoader(Image);
+                await _repository.AddAsync(slider);
+                await _repository.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View();
+                ModelState.AddModelError("", "Hata Oluştu!");
             }
+            return View(slider);
         }
 
         // GET: SlidersController/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> EditAsync(int id)
         {
-            return View();
+            return View(await _repository.FindAsync(id));
         }
 
         // POST: SlidersController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, Slider slider, IFormFile Image)
         {
             try
             {
+                if (Image != null)
+                {
+                    slider.Image = FileHelper.FileLoader(Image);
+                }
+                _repository.Update(slider);
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View();
+                ModelState.AddModelError("", "Hata Oluştu!");
             }
+            return View(slider);
         }
 
         // GET: SlidersController/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            return View();
+            return View(await _repository.FindAsync(id));
         }
 
         // POST: SlidersController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id, Slider slider)
         {
             try
             {
+                _repository.Delete(slider);
                 return RedirectToAction(nameof(Index));
             }
             catch

@@ -1,15 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Threading.Tasks;
 using Entities;
 using BL;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Http;
 using SiparisApp.WebUI.Utils;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SiparisApp.WebUI.Areas.Admin.Controllers
 {
-    [Area("Admin")]
+    [Area("Admin"), Authorize]
     public class ProductsController : Controller
     {
         private readonly IRepository<Product> _repository;
@@ -92,9 +92,9 @@ namespace SiparisApp.WebUI.Areas.Admin.Controllers
         }
 
         // GET: ProductsController/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> DeleteAsync(int id)
         {
-            return View();
+            return View(await _repository.FindAsync(id));
         }
 
         // POST: ProductsController/Delete/5
@@ -104,6 +104,7 @@ namespace SiparisApp.WebUI.Areas.Admin.Controllers
         {
             try
             {
+                _repository.Delete(product);
                 return RedirectToAction(nameof(Index));
             }
             catch

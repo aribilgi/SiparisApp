@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace SiparisApp.WebUI
 {
@@ -28,6 +29,11 @@ namespace SiparisApp.WebUI
             services.AddDbContext<DatabaseContext>(options => options.UseSqlServer()); // .net core da dbcontext i servis olarak bu þekilde eklememiz gerekiyor
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>)); // Dependency Injection ile projemize IRepository ile nesne oluþurulursa oraya Repository classýndan bir örnek göndermesini söyledik
             services.AddTransient(typeof(CustomerManager), typeof(CustomerManager)); // Class ý DI ile kullanabilmek için servis olarak bu þekilde ekleyebiliriz.
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(x =>
+            {
+                x.LoginPath = "/Admin/Login"; // Admin giriþ sayfamýzý belirttik
+            });
 
             //Diðer Dependency Injection yöntemleri :
             // AddSingleton : Uygulama ayaða kalkarken çalýþan ConfigureServices metodunda bu yöntem ile tanýmladýðýmýz her sýnýftan sadece bir örnek oluþturulur. Kim nereden çaðýrýrsa çaðýrsýn kendisine bu örnek gönderilir. Uygulama yeniden baþlayana kadar yenisi üretilmez.
@@ -55,6 +61,7 @@ namespace SiparisApp.WebUI
 
             app.UseRouting(); // uygulamada routing i aktif et
 
+            app.UseAuthentication(); // Oturum açma iþlemlerini uygulamaya dahil et
             app.UseAuthorization(); // güvenliði aktif et, oturum açma iþlemlerini
 
             app.UseEndpoints(endpoints =>

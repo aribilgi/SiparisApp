@@ -4,10 +4,11 @@ using System.Threading.Tasks;
 using Entities;
 using BL;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SiparisApp.WebUI.Areas.Admin.Controllers
 {
-    [Area("Admin")]
+    [Area("Admin"), Authorize]
     public class AddressesController : Controller
     {
         private readonly IRepository<Address> _repository; // Dependency Injection ile veritabanı işlemleri yapabilmek için IRepository interface ini burada readonly olarak tanımlıyoruz. Startup.cs dosyasında tanımladığımız services sayesinde burada constructor da yapacağımız DI işlemiyle bizim için Repository sınıfından adres işlemleri için bir nesne oluşturulur.
